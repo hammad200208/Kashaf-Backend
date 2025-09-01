@@ -1,14 +1,27 @@
+// Import mongoose (ODM for MongoDB - helps interact with MongoDB using models)
 const mongoose = require('mongoose');
-require('dotenv').config({quiet: true});
 
+// Load environment variables from .env file into process.env
+// {quiet: true} prevents warnings if .env is missing
+require('dotenv').config({ quiet: true });
+
+// Function to connect to MongoDB
 const connectDB = async () => {
     try {
+        // Use mongoose to connect to MongoDB
+        // The connection string is stored in .env file as MONGODB_URI
         await mongoose.connect(process.env.MONGODB_URI);
-        console.log('MongoDB connected');
+
+        // If successful, log confirmation message
+        console.log(' MongoDB connected');
     } catch (error) {
-        console.error(error.message);
+        // If connection fails, log error message
+        console.error(' MongoDB connection error:', error.message);
+
+        // Exit the process with failure (so app doesn't keep running without DB)
         process.exit(1);
     }
 }
 
+// Export the function so it can be used in server.js
 module.exports = connectDB;
