@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 // ==================== API ROUTES ====================
 // Any request starting with /api/users will use userRoutes
 // Example: GET /api/users , POST /api/users
-app.use("/api/users", userRoutes); 
+app.use("/api/user", userRoutes); 
 
 
 // ==================== START SERVER ====================
@@ -38,7 +38,7 @@ const PORT = process.env.PORT || 5000;
 
 // Start server and connect to MongoDB
 app.listen(PORT, async () => {
-  // Connect to MongoDB before handling requests
+  // conn
   await connectDB();
 
   // Log that server is running

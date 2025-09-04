@@ -1,5 +1,19 @@
 // Import the User model (represents the "users" collection in MongoDB)
 const User = require("../models/userModel");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config({quiet:true})
+
+
+// Helper: generate JWT
+const generateToken = (id,name,email) => {
+  return jwt.sign(
+    { id,name,email },// payload
+     process.env.JWT_SECRET, 
+     {expiresIn: "7d"});
+};
+
 
 
 // ==================== CREATE USER ====================
@@ -17,16 +31,54 @@ const createUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
+    // hash password before saving
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+
     // Create a new user in MongoDB
-    const user = await User.create({ name, email, password });
+    const user = await User.create({ name, email, password: hashedPassword });
 
     // Respond with the created user object
-    res.status(201).json(user);
+    return res.status(200).json({
+      status:200,
+      message:"User successfully Created",
+      user:user,
+      token:generateToken(user._id,user.name,user.email), //send token on register
+      });
+
   } catch (error) {
     // Handle server or database errors
     res.status(500).json({ message: error.message });
   }
 };
+
+// Login user
+const loginUser = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+
+    // check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+
+    return res.json({
+      status: 200,
+      message: "Login successful",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+      token: generateToken(user._id,user.name,user.email), // send JWT token
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 
 
 // ==================== GET ALL USERS ====================
@@ -39,8 +91,9 @@ const getUsers = async (req, res) => {
     const users = await User.find();
 
     // Send users as JSON response
-    res.json(users);
-  } catch (error) {
+    return res.status(200).json({status:200,message:"AllUsers successfully fetched", user:users});
+  }
+   catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -59,7 +112,7 @@ const getUserById = async (req, res) => {
     if (!user) return res.status(404).json({ message: "User not found" });
 
     // Return the found user
-    res.json(user);
+    return res.status(200).json({status:200,message:"User successfully fetched", user:user});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -84,7 +137,8 @@ const updateUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
 
     // Send updated user object as response
-    res.json(updatedUser);
+    return res.status(200).json({status:200,message:"User successfully Updated", user:updatedUser});
+    
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -105,7 +159,7 @@ const deleteUser = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
 
     // Respond with success message
-    res.json({ message: "User deleted successfully" });
+    res.status(200).json({status:200 ,message: "User deleted successfully",user:deletedUser });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -115,6 +169,7 @@ const deleteUser = async (req, res) => {
 // Export all controller functions so routes can use them
 module.exports = {
   createUser,
+  loginUser,
   getUsers,
   getUserById,
   updateUser,
