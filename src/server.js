@@ -1,52 +1,112 @@
-// Import express framework
+// // ایکسپریس فریم ورک امپورٹ کریں
+// const express = require("express");
+
+// // MongoDB سے کنکشن کرنے والا فنکشن امپورٹ کریں
+// const connectDB = require("./db/db"); 
+
+// // پاتھ ماڈیول (فائل پاتھ بنانے کے لیے)
+// const path = require("path");
+
+// // یوزر روٹس (CRUD APIs کے لیے)
+// const userRoutes = require("./routes/userRoutes"); 
+
+// // .env فائل سے ماحول کی ویری ایبلز لوڈ کریں
+// require("dotenv").config({ quiet: true });
+
+// // اپ لوڈ روٹس (امیج اپ لوڈ کے لیے)
+// const uploadRoutes = require("./routes/uploadImageRoutes");
+
+// // ایکسپریس ایپ بنائیں
+// const app = express();
+
+
+// // ==================== MIDDLEWARE ====================
+// // JSON ڈیٹا کو پڑھنے کے لیے مڈل ویئر (req.body استعمال کرنے کے لیے)
+// app.use(express.json()); 
+
+// // اپ لوڈز فولڈر کو اسٹاٹک فائلز کے طور پر ایکسیس ایبل بنائیں
+// // مثال: http://localhost:5000/uploads/filename.png
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+
+// // ==================== ROOT ROUTE ====================
+// // ٹیسٹنگ کے لیے ایک سادہ روٹ تاکہ پتا چلے سرور چل رہا ہے
+// app.get("/", (req, res) => {
+//   res.send("<h1>Server is running</h1>");
+// });
+
+
+// // ==================== API ROUTES ====================
+// // امیج اپ لوڈ روٹ
+// // اس کے لیے اصل یو آر ایل ہوگا: POST http://localhost:5000/api/uploadImage
+// app.use("/api/uploadImage", uploadRoutes);
+
+// // یوزر روٹس (CRUD آپریشنز کے لیے)
+// app.use("/api/user", userRoutes); 
+
+
+// // ==================== START SERVER ====================
+// // پورٹ نمبر .env فائل سے یا پھر 5000
+// const PORT = process.env.PORT || 5000;
+
+// // سرور کو اسٹارٹ کریں اور ساتھ میں ڈیٹابیس سے کنکشن کریں
+// app.listen(PORT, async () => {
+//   await connectDB(); // ڈیٹابیس کنکشن
+
+//   console.log(`🚀 Server is running on http://localhost:${PORT}`);
+// });
+
+
+// ایکسپریس فریم ورک امپورٹ کریں
 const express = require("express");
 
-// Import MongoDB connection function
+// MongoDB سے کنکشن کرنے والا فنکشن امپورٹ کریں
 const connectDB = require("./db/db"); 
 
-const path = require("path");
-
-
-// Import user routes (all CRUD APIs for User)
+// یوزر روٹس (CRUD APIs کے لیے)
 const userRoutes = require("./routes/userRoutes"); 
 
-// Load environment variables from .env file
+// .env فائل سے ماحول کی ویری ایبلز لوڈ کریں
 require("dotenv").config({ quiet: true });
 
-const uploadRoutes = require("./routes/uploadImageRoutes");
+// کلاؤڈینری اپ لوڈ روٹس (امیج اپ لوڈ کے لیے)
+const uploadRoutes = require("./routes/uploadImageRoutes"); // ✅ use new file name
 
-// Create an express app
+// ایکسپریس ایپ بنائیں
 const app = express();
 
-
 // ==================== MIDDLEWARE ====================
-// Middleware to parse incoming JSON requests (req.body)
+// JSON ڈیٹا کو پڑھنے کے لیے مڈل ویئر (req.body استعمال کرنے کے لیے)
 app.use(express.json()); 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// ❌ اب ہمیں اپ لوڈز فولڈر کو اسٹاٹک فائلز کے طور پر ایکسیس ایبل بنانے کی ضرورت نہیں
+// کیونکہ فائلز کلاؤڈینری پر جا رہی ہیں
+// app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // ==================== ROOT ROUTE ====================
-// Default route for testing server is running
+// ٹیسٹنگ کے لیے ایک سادہ روٹ تاکہ پتا چلے سرور چل رہا ہے
 app.get("/", (req, res) => {
-  res.send("<h1>Server is running</h1>");
+  res.send("<h1>🚀 Server is running</h1>");
 });
 
-
 // ==================== API ROUTES ====================
-// Any request starting with /api/users will use userRoutes
-// Example: GET /api/users , POST /api/users
+// امیج اپ لوڈ روٹ
+// اصل یو آر ایل ہوگا: POST http://localhost:5000/api/files/upload
 app.use("/api/uploadImage", uploadRoutes);
-app.use("/api/user", userRoutes); 
 
+const deleteUploadRoutes = require("./routes/deleteUploadImageRoutes");
+app.use("/api/deleteImage", deleteUploadRoutes);
+
+
+// یوزر روٹس (CRUD آپریشنز کے لیے)
+app.use("/api/user", userRoutes);
 
 // ==================== START SERVER ====================
-// Get PORT from .env or fallback to 5000
+// پورٹ نمبر .env فائل سے یا پھر 5000
 const PORT = process.env.PORT || 5000;
 
-// Start server and connect to MongoDB
+// سرور کو اسٹارٹ کریں اور ساتھ میں ڈیٹابیس سے کنکشن کریں
 app.listen(PORT, async () => {
-  // conn
-  await connectDB();
-
-  // Log that server is running
-  console.log(` Server is running on http://localhost:${PORT}`);
+  await connectDB(); // ڈیٹابیس کنکشن
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
