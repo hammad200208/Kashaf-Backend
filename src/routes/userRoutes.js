@@ -14,38 +14,156 @@ const {
 // Create a new router object
 const router = express.Router();
 
-// ==================== ROUTES ====================
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User management and authentication
+ */
 
-// @route   POST /api/users
-// @desc    Create a new user
-// @access  Public
+/**
+ * @swagger
+ * /api/user/create:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 example: secret123
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       400:
+ *         description: Invalid input
+ */
 router.post("/create", createUser);
 
-// @route   GET /api/users
-// @desc    Get all users
-// @access  Public
-
+/**
+ * @swagger
+ * /api/user/login:
+ *   post:
+ *     summary: Login a user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: john@example.com
+ *               password:
+ *                 type: string
+ *                 example: secret123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *       401:
+ *         description: Invalid credentials
+ */
 router.post("/login", loginUser);
 
-// @route   GET /api/users
-// @desc    Get all users
-// @access  Public
-
+/**
+ * @swagger
+ * /api/user/getAll:
+ *   get:
+ *     summary: Get all users
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: List of all users
+ */
 router.get("/getAll", getUsers);
 
-// @route   GET /api/users/:id
-// @desc    Get a single user by ID
-// @access  Public
+/**
+ * @swagger
+ * /api/user/getOne/{id}:
+ *   get:
+ *     summary: Get a user by ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User data retrieved
+ *       404:
+ *         description: User not found
+ */
 router.get("/getOne/:id", getUserById);
 
-// @route   PUT /api/users/:id
-// @desc    Update user by ID
-// @access  Public
+/**
+ * @swagger
+ * /api/user/update/{id}:
+ *   put:
+ *     summary: Update a user by ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Jane Doe
+ *               email:
+ *                 type: string
+ *                 example: jane@example.com
+ *     responses:
+ *       200:
+ *         description: User updated successfully
+ *       404:
+ *         description: User not found
+ */
 router.put("/update/:id", updateUser);
 
-// @route   DELETE /api/users/:id
-// @desc    Delete user by ID
-// @access  Public
+/**
+ * @swagger
+ * /api/user/delete/{id}:
+ *   delete:
+ *     summary: Delete a user by ID
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       404:
+ *         description: User not found
+ */
 router.delete("/delete/:id", deleteUser);
 
 // Export the router so it can be used in server.js
