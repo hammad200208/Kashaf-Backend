@@ -65,5 +65,5 @@ app.listen(PORT, async () => {
   await connectDB(); // ڈیٹابیس کنکشن
   console.log(`Server is running on http://localhost:${PORT}`);
   console.log(`📄 Swagger JSON available at http://localhost:${PORT}/docs.json`);
-  console.log(`🌐 Swagger UI available at http://localhost:${PORT}/docs`);
+  console.log(`🌐 Swagger UI available at http://localhost:${PORT}/api-docs`);
 });
